@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.pokemontcg.io https://raw.githubusercontent.com; connect-src 'self' https://api.pokemontcg.io https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+<title>Poke Assistente</title>
+<style>
+:root{--a:#ffcb05;--r:#ff5252;--g:#3ec97b;--t:#f2f6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#07161c;color:var(--t);font-family:system-ui,sans-serif;padding-bottom:60px;user-select:none}
+header{display:flex;align-items:center;gap:6px;padding:8px;background:#0b242c;position:sticky;top:0;z-index:5}
+.seg{display:flex;background:#06141a;border-radius:20px;overflow:hidden;flex:1}
+.seg button{flex:1;border:0;background:none;color:#8aa;padding:8px 4px;font-size:12px}.seg button.on{background:var(--a);color:#000;font-weight:700}
+.ib{border:0;background:#16363f;color:var(--t);border-radius:10px;padding:8px 10px;font-size:15px}
+.turn{display:flex;align-items:center;gap:4px;font-size:12px}
+#toast{text-align:center;color:var(--a);font-weight:800;font-size:18px;height:22px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#050d11;z-index:9}
+nav button{flex:1;padding:12px 0;background:none;border:0;color:#789;font-size:12px}nav button.on{color:var(--a);font-weight:700}
+section{display:none;padding:8px;max-width:440px;margin:auto}section.on{display:block}
+.mat{border-radius:18px;padding:8px 6px;margin:6px 0;background:radial-gradient(ellipse at 50% 40%,#17665a,#0d3b3a 70%);border:2px solid #d9b94d55;box-shadow:inset 0 0 30px #0008}
+.mh{display:flex;justify-content:space-between;font-size:calc(var(--u)*14px);padding:0 4px 4px;color:#cfe}
+.body{display:flex;flex-direction:column;gap:calc(var(--u)*8px)}.opp .body{flex-direction:column-reverse}
+.top{display:flex;justify-content:space-between;align-items:center;padding:0 2px}.opp .top{flex-direction:row-reverse}
+.bench{display:flex;justify-content:center;gap:calc(var(--u)*6px)}
+.slot{position:relative;width:calc(var(--u)*62px);height:calc(var(--u)*87px);border-radius:calc(var(--u)*8px);border:2px dashed #ffd76480;background:#ffffff0d;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;color:#ffd764aa;font-size:calc(var(--u)*11px)}
+.slot.act{width:calc(var(--u)*118px);height:calc(var(--u)*165px)}
+.slot.on{border:2px solid var(--a);border-style:solid;background:linear-gradient(160deg,#34436e,#1a2140);color:var(--t);box-shadow:0 3px 10px #0008}
+.slot .plus{font-size:calc(var(--u)*28px)}
+.db{font-size:calc(var(--u)*30px);font-weight:900;text-shadow:0 2px 4px #000}.act .db{font-size:calc(var(--u)*52px)}
+.db small{font-size:.4em;display:block;opacity:.7;font-weight:600}
+.bar{width:84%;height:calc(var(--u)*6px);background:#0007;border-radius:4px;overflow:hidden;margin-top:3px}.bar i{display:block;height:100%}
+.hpt{font-size:calc(var(--u)*11px);opacity:.85;margin-top:2px}
+.en{position:absolute;top:2px;left:3px;font-size:calc(var(--u)*11px);font-weight:800;color:var(--a)}
+.sts{position:absolute;bottom:2px;font-size:calc(var(--u)*13px)}
+.ko{position:absolute;inset:0;background:#c00c;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*22px);font-weight:900}
+.przs{display:grid;grid-template-columns:repeat(2,auto);gap:calc(var(--u)*4px)}
+.pz{width:calc(var(--u)*36px);height:calc(var(--u)*50px);border-radius:5px;background:url(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png) center/75% no-repeat,linear-gradient(160deg,#2a5db0,#173a78);border:1px solid #fff6}
+.pz.t{opacity:.12}
+.side{display:flex;flex-direction:column;gap:calc(var(--u)*6px)}
+.cnt{width:calc(var(--u)*66px);text-align:center;background:#0006;border:1px solid #ffd76455;border-radius:8px;padding:2px;font-size:calc(var(--u)*10px)}
+.cnt .n{font-size:calc(var(--u)*22px);font-weight:800}
+.cnt button{border:0;background:#fff2;color:var(--t);border-radius:5px;width:calc(var(--u)*26px);height:calc(var(--u)*22px);font-size:calc(var(--u)*14px)}
+.stad{text-align:center;font-size:12px;color:#ffd764;padding:4px;border:1px dashed #ffd76455;border-radius:10px;margin:2px 0}
+#ov{display:none;position:fixed;inset:0;background:#000a;z-index:20;align-items:flex-end}#ov.on{display:flex}
+#sh{background:#101c2a;width:100%;border-radius:20px 20px 0 0;padding:14px;max-width:440px;margin:auto}
+#sh .r{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:8px 0}
+.b{border:0;background:#243553;color:var(--t);border-radius:10px;padding:12px;font-size:16px;flex:1}.b.p{background:var(--a);color:#000;font-weight:800}.b.d{background:#7a1f1f}
+.big{font-size:44px;font-weight:900;min-width:80px;text-align:center}
+.ch span{display:inline-block;padding:8px 10px;margin:3px;border-radius:16px;background:#243553;font-size:13px}.ch span.on{background:var(--r)}
+input[type=number]{background:#243553;color:var(--t);border:0;border-radius:8px;padding:10px;width:90px;font-size:18px;text-align:center}
+.card{background:#102632;border-radius:14px;padding:12px;margin:8px 0}
+details{background:#102632;border-radius:12px;padding:10px 12px;margin:6px 0}summary{font-weight:700;color:var(--a)}li{margin:6px 0}ul{padding-left:18px}
+.slot.pic{background-size:cover;background-position:center;background-color:#000;border-color:#fff8}
+.pic .en{background:#000b;border-radius:6px;padding:1px 4px}
+.dc{position:absolute;top:2px;right:2px;min-width:calc(var(--u)*26px);height:calc(var(--u)*26px);padding:0 4px;background:var(--r);border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:calc(var(--u)*14px);box-shadow:0 2px 6px #000a}.act .dc{min-width:calc(var(--u)*40px);height:calc(var(--u)*40px);font-size:calc(var(--u)*22px)}
+.pic .sts{top:2px;bottom:auto;left:calc(var(--u)*24px);background:#000b;border-radius:8px;padding:0 3px}
+.ft{position:absolute;bottom:0;left:0;right:0;background:#000b;padding:2px 0;display:flex;flex-direction:column;align-items:center}
+input{user-select:text}#sh{max-height:88vh;overflow:auto}
+#q{width:auto;flex:1;text-align:left;font-size:16px;background:#243553;color:var(--t);border:0;border-radius:8px;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:34vh;overflow:auto}.grid img{width:100%;border-radius:5px}
+</style></head><body>
+<header><div class="turn"><button class="ib" onclick="tn(-1)">−</button><b id="tn"></b><button class="ib" onclick="tn(1)">+</button></div>
+<div class="seg"><button id="m0" onclick="mode(0)">Meu campo</button><button id="m1" onclick="mode(1)">Dois campos</button></div>
+<button class="ib" onclick="coin()">🪙</button><button class="ib" onclick="die()">🎲</button></header>
+<div id="toast"></div>
+<section id="s0" class="on"></section>
+<section id="s1"><div class="card"><h3>Calculadora de dano</h3>
+<div class="r" style="display:flex;justify-content:space-between;align-items:center">Dano base <input id="cb" type="number" value="60" oninput="calc()"></div><br>
+<div style="display:flex;justify-content:space-between;align-items:center">Efeitos (+/−) <input id="cx" type="number" value="0" oninput="calc()"></div><br>
+<label><input type="checkbox" id="cw" onchange="calc()"> Fraqueza ×2</label><br><br>
+<label><input type="checkbox" id="cr" onchange="calc()"> Resistência −30</label>
+<h2>= <span id="cres" style="color:var(--a)"></span></h2>
+<small>Ordem: base + efeitos → fraqueza ×2 → resistência −30. Contadores = dano ÷ 10.</small></div></section>
+<section id="s2">
+<details open><summary>Montagem</summary><ul><li>Baralho de 60 cartas e 7 na mão; sem Básico, faz mulligan.</li><li>1 Básico como Ativo e até 5 no Banco, viradas para baixo.</li><li>6 cartas de Prêmio. Cara ou coroa decide quem começa.</li></ul></details>
+<details><summary>Seu turno</summary><ul><li>Compre 1 carta (sem carta para comprar, perde).</li><li>Pode: baixar Básicos; evoluir (não no 1º turno do Pokémon nem no turno em que entrou em jogo); 1 Energia por turno; Treinadores; recuar 1 vez.</li><li>Item: quantos quiser. Apoiador: 1 por turno. Estádio: 1 por turno. Ferramenta: 1 por Pokémon.</li><li>Quem começa não ataca nem joga Apoiador no 1º turno.</li><li>Atacar encerra o turno.</li></ul></details>
+<details><summary>Dano e nocaute</summary><ul><li>Fraqueza ×2, resistência −30.</li><li>Dano vai ao Ativo, salvo texto da carta.</li><li>Dano ≥ PS = nocaute: descarta e o oponente pega Prêmio(s).</li><li>ex/V valem 2 Prêmios; VMAX/VSTAR/Mega ex, 3 (confira a carta).</li><li>Depois do nocaute, o dono escolhe novo Ativo do Banco.</li></ul></details>
+<details><summary>Condições especiais</summary><ul><li>😴 Dormindo: não ataca nem recua; cara no checkup acorda.</li><li>⚡ Paralisado: não ataca nem recua; some no fim do próximo turno do dono.</li><li>😵 Confuso: ao atacar, lança moeda; coroa = não ataca e 30 de dano em si.</li><li>☠️ Envenenado: +10 por checkup.</li><li>🔥 Queimado: +20 por checkup; cara cura.</li><li>Recuar ou evoluir cura tudo. Dormindo, paralisado e confuso não se acumulam.</li></ul></details>
+<details><summary>Checkup e vitória</summary><ul><li>Entre os turnos: veneno, queimadura, sono, paralisia; depois nocautes.</li><li>Vence quem pegar todos os Prêmios, deixar o oponente sem Pokémon em jogo ou sem carta para comprar.</li></ul></details>
+<small>Resumo em minhas palavras. O texto da carta sempre vence o livro de regras.</small></section>
+<section id="s3"><div class="card"><h3>Atualização</h3><p>Versão instalada: <b id="v">__VERSION__</b></p>
+<button class="b p" onclick="upd()" style="width:100%">Buscar atualização</button><p id="us"></p></div>
+<div class="card"><button class="b d" style="width:100%" onclick="reset()">Zerar partida</button></div></section>
+<div id="ov" onclick="if(event.target==this)closeS()"><div id="sh"></div></div>
+<nav><button class="on" onclick="tab(0)">🎴 Mesa</button><button onclick="tab(1)">🧮 Calc</button><button onclick="tab(2)">📖 Regras</button><button onclick="tab(3)">⚙️ Mais</button></nav>
+<script>
+const REPO="SaturnLucas/poke-assistente",ST=["😴 Dormindo","🔥 Queimado","☠️ Envenenado","😵 Confuso","⚡ Paralisado"],SI=["😴","🔥","☠️","😵","⚡"];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),okImg=u=>typeof u=="string"&&/^https:\/\/images\.pokemontcg\.io\/[\w\-\/\.]+$/.test(u);
+let res=[],rmsg="",q="";const mkS=()=>({on:0,hp:0,dmg:0,en:0,st:[],img:"",nm:""}),mkP=n=>({n,s:Array.from({length:6},mkS),z:[0,0,0,0,0,0],deck:60,disc:0});
+const fresh=()=>({turn:1,two:0,stad:"",p:[mkP("Eu"),mkP("Oponente")]});
+let S;try{S=JSON.parse(localStorage.s2)}catch(e){}if(!S||!S.p)S=fresh();
+let cur=null;const $=i=>document.getElementById(i),save=()=>{try{localStorage.s2=JSON.stringify(S)}catch(e){}};
+const sl=()=>S.p[cur.i].s[cur.k];
+function tab(i){document.querySelectorAll("section").forEach((e,k)=>e.classList.toggle("on",k==i));document.querySelectorAll("nav button").forEach((e,k)=>e.classList.toggle("on",k==i))}
+function slot(i,k){const s=S.p[i].s[k],a=k==0;if(!s.on)return`<div class="slot ${a?"act":""}" onclick="openS(${i},${k})"><span class="plus">+</span>${a?"ATIVO":"Banco "+k}</div>`;
+const rem=Math.max(0,s.hp-s.dmg),pc=s.hp?rem/s.hp*100:100,col=pc>50?"#3ec97b":pc>25?"#ffcb05":"#ff5252",ko=s.hp>0&&s.dmg>=s.hp;
+if(okImg(s.img))return`<div class="slot on pic ${a?"act":""}" style="background-image:url('${s.img}')" onclick="openS(${i},${k})">${s.en?`<div class="en">⚡${s.en}</div>`:""}${s.dmg?`<div class="dc">${s.dmg}</div>`:""}${a&&s.st.length?`<div class="sts">${s.st.map(j=>SI[j]).join("")}</div>`:""}${s.hp?`<div class="ft"><div class="bar"><i style="width:${pc}%;background:${col}"></i></div><div class="hpt">PS ${rem}/${s.hp}</div></div>`:""}${ko?'<div class="ko">KO</div>':""}</div>`;
+return`<div class="slot on ${a?"act":""}" onclick="openS(${i},${k})">${s.en?`<div class="en">⚡${s.en}</div>`:""}<div class="db">${s.dmg}<small>dano</small></div>${s.hp?`<div class="bar"><i style="width:${pc}%;background:${col}"></i></div><div class="hpt">PS ${rem}/${s.hp}</div>`:`<div class="hpt">sem PS</div>`}${a&&s.st.length?`<div class="sts">${s.st.map(j=>SI[j]).join("")}</div>`:""}${ko?'<div class="ko">KO</div>':""}</div>`}
+function mat(i,opp,u){const p=S.p[i],left=p.z.filter(x=>!x).length;
+return`<div class="mat ${opp?"opp":""}" style="--u:${u}"><div class="mh"><b onclick="rn(${i})">${esc(p.n)} ✎</b><span>🏆 ${left} restantes</span></div><div class="body"><div class="top"><div class="przs">${p.z.map((t,j)=>`<div class="pz ${t?"t":""}" onclick="tz(${i},${j})"></div>`).join("")}</div>${slot(i,0)}<div class="side">${cnt(i,"deck","Baralho")}${cnt(i,"disc","Descarte")}</div></div><div class="bench">${[1,2,3,4,5].map(k=>slot(i,k)).join("")}</div></div></div>`}
+function cnt(i,f,l){return`<div class="cnt">${l}<div class="n">${S.p[i][f]}</div><button onclick="cn(${i},'${f}',-1)">−</button><button onclick="cn(${i},'${f}',1)">+</button></div>`}
+const stad=()=>`<div class="stad" onclick="sd()">🏟 Estádio: ${esc(S.stad)||"(toque para definir)"}</div>`;
+function render(){$("tn").textContent="T"+S.turn;$("m0").classList.toggle("on",!S.two);$("m1").classList.toggle("on",!!S.two);
+$("s0").innerHTML=S.two?mat(1,1,.62)+stad()+mat(0,0,.62):mat(0,0,1)+stad()}
+function up(){save();render();if(cur)sheet()}
+function mode(m){S.two=m;up()}function tn(d){S.turn=Math.max(1,S.turn+d);up()}
+function tz(i,j){S.p[i].z[j]^=1;up()}function cn(i,f,d){S.p[i][f]=Math.max(0,S.p[i][f]+d);up()}
+function rn(i){const n=prompt("Nome do jogador",S.p[i].n);if(n){S.p[i].n=n;up()}}function sd(){const n=prompt("Estádio em jogo (vazio = nenhum)",S.stad);if(n!==null){S.stad=n;up()}}
+function openS(i,k){cur={i,k};res=[];rmsg="";q="";sl().on=1;save();render();sheet();$("ov").classList.add("on")}
+function closeS(){cur=null;$("ov").classList.remove("on");render()}
+function sheet(){const s=sl(),a=cur.k==0;$("sh").innerHTML=`<div class="r"><b>${esc(s.nm)||(a?"Pokémon Ativo":"Banco "+cur.k)} — ${S.p[cur.i].n}</b><button class="ib" onclick="closeS()">✕</button></div>
+<div class="r"><input id="q" type="text" placeholder="Buscar carta (ex: Pikachu)" value="${q}" onkeydown="if(event.key=='Enter')srch()"><button class="b p" style="flex:0 0 56px" onclick="srch()">🔎</button></div><div id="rs">${rhtml()}</div>
+<div class="r"><span>PS máximo</span><input type="number" value="${s.hp||""}" onchange="chg(()=>sl().hp=+this.value||0)"></div>
+<div class="r"><button class="b" onclick="dg(-50)">−50</button><button class="b" onclick="dg(-10)">−10</button><div class="big" style="${s.hp&&s.dmg>=s.hp?"color:var(--r)":""}">${s.dmg}</div><button class="b p" onclick="dg(10)">+10</button><button class="b p" onclick="dg(50)">+50</button></div>
+<div class="r"><span>⚡ Energias</span><button class="b" style="flex:0 0 56px" onclick="chg(()=>sl().en=Math.max(0,sl().en-1))">−</button><b style="font-size:22px">${s.en}</b><button class="b p" style="flex:0 0 56px" onclick="chg(()=>sl().en++)">+</button></div>
+${a?`<div class="ch">${ST.map((t,j)=>`<span class="${s.st.includes(j)?"on":""}" onclick="stc(${j})">${t}</span>`).join("")}</div>`:""}
+<div class="r">${a?"":`<button class="b" onclick="toAct()">⬆ Tornar Ativo</button>`}<button class="b d" onclick="rm(1)">💀 Nocaute</button><button class="b" onclick="rm(0)">Remover</button></div>`}
+const rhtml=()=>res.length?`<div class="grid">${res.map((c,n)=>`<img src="${c.images.small}" onclick="pick(${n})">`).join("")}</div>`:`<small>${rmsg}</small>`;
+async function srch(){q=$("q").value.trim();if(!q)return;rmsg="Buscando...";res=[];$("rs").innerHTML=rhtml();
+try{const r=await fetch("https://api.pokemontcg.io/v2/cards?pageSize=20&orderBy=-set.releaseDate&select=id,name,hp,images&q="+encodeURIComponent('name:"'+q+'*"'));const j=await r.json();res=(j.data||[]).filter(c=>c.images&&okImg(c.images.small));rmsg=res.length?"":"Nenhuma carta encontrada."}catch(e){rmsg="Sem conexão ou serviço fora do ar. Tente de novo."}
+$("rs").innerHTML=rhtml()}
+function pick(n){const c=res[n];res=[];q="";chg(()=>{const s=sl();s.img=c.images.small;s.nm=String(c.name||"").slice(0,40);const h=parseInt(c.hp);if(h)s.hp=h})}
+function chg(f){f();up()}function dg(d){chg(()=>sl().dmg=Math.max(0,sl().dmg+d))}
+function stc(j){chg(()=>{const s=sl(),x=s.st.indexOf(j);if(x>=0)s.st.splice(x,1);else{if([0,3,4].includes(j))s.st=s.st.filter(a=>![0,3,4].includes(a));s.st.push(j)}})}
+function toAct(){const p=S.p[cur.i],k=cur.k;p.s[k].st=[];p.s[0].st=[];[p.s[0],p.s[k]]=[p.s[k],p.s[0]];cur.k=0;up()}
+function rm(ko){const p=S.p[cur.i];p.s[cur.k]=mkS();if(ko)p.disc++;closeS();save();render()}
+function calc(){let r=(+$("cb").value||0)+(+$("cx").value||0);if($("cw").checked)r*=2;if($("cr").checked)r-=30;r=Math.max(0,r);$("cres").textContent=r+" ("+r/10+" contadores)"}
+function toast(t){$("toast").textContent=t;clearTimeout(window._t);window._t=setTimeout(()=>$("toast").textContent="",2500)}
+function coin(){toast("🪙 "+(Math.random()<.5?"CARA":"COROA"))}function die(){toast("🎲 "+(1+Math.floor(Math.random()*6)))}
+function reset(){if(confirm("Zerar a partida inteira?")){S=fresh();save();render();tab(0)}}
+async function upd(){const o=$("us");o.textContent="Buscando...";try{const r=await fetch("https://api.github.com/repos/"+REPO+"/releases/latest");if(!r.ok)throw 0;const j=await r.json();if(!/^v\d+\.\d+\.\d+$/.test(j.tag_name))throw 0;const n=j.tag_name.slice(1),c=$("v").textContent;
+const nw=n.split(".").map(Number),cu=c.split(".").map(Number);let nr=false;for(let i=0;i<3;i++){if((nw[i]||0)>(cu[i]||0)){nr=true;break}if((nw[i]||0)<(cu[i]||0))break}
+const a=(j.assets||[]).find(x=>x.name=="PokeAssistente.apk"),OK=/^https:\/\/github\.com\/SaturnLucas\/poke-assistente\/releases\/download\/v\d+\.\d+\.\d+\/PokeAssistente\.apk$/;
+o.textContent="";if(!nr){o.textContent="Você está na versão mais recente ✅";return}
+if(!a||!OK.test(a.browser_download_url)){o.textContent="Atualização encontrada, mas o endereço não é confiável. Ignorada.";return}
+o.append("Nova versão "+n+"!",document.createElement("br"),document.createElement("br"));const b=document.createElement("button");b.className="b p";b.textContent="Baixar e instalar";b.onclick=()=>{location.href=a.browser_download_url};o.append(b)}catch(e){o.textContent="Não consegui checar. Verifique a internet."}}
+render();calc();
+</script></body></html>
